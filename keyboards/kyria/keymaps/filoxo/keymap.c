@@ -16,7 +16,7 @@
 #include QMK_KEYBOARD_H
 
 enum layers {
-    _QWERTY = 0,
+    _BASE = 0,
     _LOWER,
     _RAISE,
     _ADJUST
@@ -30,7 +30,7 @@ enum custom_keycodes {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_QWERTY] = LAYOUT(
+    [_BASE] = LAYOUT(
       KC_ESC,  KC_Q,   KC_W,   KC_E,   KC_R,   KC_T,                                             KC_Y,    KC_U,    KC_I,   KC_O,    KC_P,    KC_MUTE,
       KC_TAB,  KC_A,   KC_S,   KC_D,   KC_F,   KC_G,                                             KC_H,    KC_J,    KC_K,   KC_L,    KC_SCLN, KC_QUOT,
       KC_LSFT, KC_NO,  KC_Z,   KC_X,   KC_C,   KC_V,   KC_LBRC,KC_NO,           KC_NO,  KC_RBRC, KC_B,    KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH,
@@ -254,44 +254,143 @@ static void render_bongocat_logo(void) {
     }
 }
 
-static void render_qmk_logo(void) {
-  static const char PROGMEM qmk_logo[] = {
-    0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94,
-    0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4,
-    0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,0};
+// static void render_qmk_logo(void) {
+//   static const char PROGMEM qmk_logo[] = {
+//     0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94,
+//     0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4,
+//     0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,0};
 
-  oled_write_P(qmk_logo, false);
+//   oled_write_P(qmk_logo, false);
+// }
+
+void render_space(void) {
+    oled_write_P(PSTR("     "), false);
 }
 
+static const char BEGIN_OFF_T = 0xc5;
+static const char BEGIN_OFF_B = 0xc6;
+
+static const char BEGIN_ON_T = 0xc7;
+static const char BEGIN_ON_B = 0xc8;
+
+static const char END_OFF_T = 0xc9;
+static const char END_OFF_B = 0xca;
+
+static const char END_ON_T = 0xcb;
+static const char END_ON_B = 0xcc;
+
+void render_icon(bool on, const char icon_on[2][5], const char icon_off[2][5], int col, int row) {
+    for (int i = 0; i < 2; i++) {
+        oled_set_cursor(col, i + row);
+        oled_write_P((on ? icon_on : icon_off)[i], false);
+    };
+};
+
+void render_gui_status(bool on, int col, int row) {
+    static const char PROGMEM gui_off[2][5] = {
+        { BEGIN_OFF_T, 0x85, 0x86, END_OFF_T, 0},
+        { BEGIN_OFF_B, 0xa5, 0xa6, END_OFF_B, 0}
+    };
+    static const char PROGMEM gui_on[2][5] = {
+        { BEGIN_ON_T, 0x8d, 0x8e, END_ON_T, 0},
+        { BEGIN_ON_B, 0xad, 0xae, END_ON_B, 0}
+    };
+    render_icon(on, gui_on, gui_off, col, row);
+};
+
+void render_alt_status(bool on, int col, int row) {
+    static const char PROGMEM alt_off[2][5] = {
+        { BEGIN_OFF_T, 0x87, 0x88, END_OFF_T, 0},
+        { BEGIN_OFF_B, 0xa7, 0xa8, END_OFF_B, 0}
+    };
+    static const char PROGMEM alt_on[2][5] = {
+        { BEGIN_ON_T, 0x8f, 0x90, END_ON_T, 0},
+        { BEGIN_ON_B, 0xaf, 0xb0, END_ON_B, 0}
+    };
+    render_icon(on, alt_on, alt_off, col, row);
+};
+
+void render_ctl_status(bool on, int col, int row) {
+    static const char PROGMEM ctl_off[2][5] = {
+        { BEGIN_OFF_T, 0x89, 0x8a, END_OFF_T, 0},
+        { BEGIN_OFF_B, 0xa9, 0xaa, END_OFF_B, 0}
+    };
+    static const char PROGMEM ctl_on[2][5] = {
+        { BEGIN_ON_T, 0x91, 0x92, END_ON_T, 0 },
+        { BEGIN_ON_B, 0xb1, 0xb2, END_ON_B, 0}
+    };
+    render_icon(on, ctl_on, ctl_off, col, row);
+};
+
+void render_shft_status(bool on, int col, int row) { 
+    static const char PROGMEM shift_off[2][5] = {
+        { BEGIN_OFF_T, 0x8b, 0x8c, END_OFF_T, 0},
+        { BEGIN_OFF_B, 0xab, 0xac, END_OFF_B, 0}
+    };
+    static const char PROGMEM shift_on[2][5] = {
+        { BEGIN_ON_T, 0xcd, 0xce, END_ON_T, 0 },
+        { BEGIN_ON_B, 0xcf, 0xd0, END_ON_B, 0}
+    };
+    render_icon(on, shift_on, shift_off, col, row);
+};
+
+void render_logo(void) {
+    static const char PROGMEM corne_logo[3][6] = {
+        { 0x80, 0x81, 0x82, 0x83, 0x84, 0 }, 
+        { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0 },
+        { 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0 }
+    };
+    for (int i = 0; i < 3; i++) {
+        oled_set_cursor(8, i + 1);
+        oled_write_P(corne_logo[i], false);
+    };
+}
+
+void render_layer_state(int col, int row) {
+    uint8_t current_layer = get_highest_layer(layer_state);
+
+    static const char PROGMEM layer_icons[4][3][6] = {
+        // Base layer
+        {
+            { 0x20, 0x94, 0x95, 0x96, 0x20, 0 },
+            { 0x20, 0xb4, 0xb5, 0xb6, 0x20, 0 },
+            { 0x20, 0xd4, 0xd5, 0xd6, 0x20, 0 }
+        },
+        // Lower layer
+        {
+            { 0x20, 0x9a, 0x9b, 0x9c, 0x20, 0 },
+            { 0x20, 0xba, 0xbb, 0xbc, 0x20, 0 },
+            { 0x20, 0xda, 0xdb, 0xdc, 0x20, 0 }
+        },
+        // Raise layer
+        {
+            { 0x20, 0x97, 0x98, 0x99, 0x20, 0 },
+            { 0x20, 0xb7, 0xb8, 0xb9, 0x20, 0 },
+            { 0x20, 0xd7, 0xd8, 0xd9, 0x20, 0 }
+        },
+        // Adjust layer
+        {
+            { 0x20, 0x9d, 0x9e, 0x9f, 0x20, 0 },
+            { 0x20, 0xbd, 0xbe, 0xbf, 0x20, 0 },
+            { 0x20, 0xdd, 0xde, 0xdf, 0x20, 0 }
+        }
+    };
+    
+    for (int i = 0; i < 3; i++) {
+        oled_set_cursor(col, i + row);
+        oled_write_P(layer_icons[current_layer][i], false);
+    };
+};
+
 static void render_status(void) {
-    // QMK Logo and version information
-    render_qmk_logo();
-    // oled_write_P(PSTR("Kyria rev1.0\n\n"), false);
-
-    // Host Keyboard Layer Status
-    oled_write_P(PSTR("Layer: "), false);
-    switch (get_highest_layer(layer_state)) {
-        case _QWERTY:
-            oled_write_P(PSTR("Default\n"), false);
-            break;
-        case _LOWER:
-            oled_write_P(PSTR("Lower\n"), false);
-            break;
-        case _RAISE:
-            oled_write_P(PSTR("Raise\n"), false);
-            break;
-        case _ADJUST:
-            oled_write_P(PSTR("Adjust\n"), false);
-            break;
-        default:
-            oled_write_P(PSTR("Undefined\n"), false);
-    }
-
-    // Host Keyboard LED Status
-    uint8_t led_usb_state = host_keyboard_leds();
-    oled_write_P(IS_LED_ON(led_usb_state, USB_LED_NUM_LOCK) ? PSTR("NUMLCK ") : PSTR("       "), false);
-    oled_write_P(IS_LED_ON(led_usb_state, USB_LED_CAPS_LOCK) ? PSTR("CAPLCK ") : PSTR("       "), false);
-    oled_write_P(IS_LED_ON(led_usb_state, USB_LED_SCROLL_LOCK) ? PSTR("SCRLCK ") : PSTR("       "), false);
+    render_logo();
+    render_layer_state(0, 5);
+    uint8_t modifiers = get_mods() | get_oneshot_mods();
+    int row = 6;
+    render_shft_status(modifiers & MOD_MASK_SHIFT, 5, row);
+    render_ctl_status(modifiers & MOD_MASK_CTRL, 9, row);
+    render_alt_status(modifiers & MOD_MASK_ALT, 13, row);
+    render_gui_status(modifiers & MOD_MASK_GUI, 17, row);
 }
 
 void oled_task_user(void) {

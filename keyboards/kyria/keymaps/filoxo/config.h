@@ -18,6 +18,7 @@
 
 #ifdef OLED_DRIVER_ENABLE
   #define OLED_DISPLAY_128X64
+  #define OLED_FONT_H "keyboards/kyria/keymaps/filoxo/glcdfont-quetzalcoatl.c"
 #endif
 
 #ifdef RGBLIGHT_ENABLE

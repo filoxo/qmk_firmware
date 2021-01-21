@@ -280,6 +280,9 @@ static const char END_ON_T = 0xcb;
 static const char END_ON_B = 0xcc;
 
 void render_icon(bool on, const char icon_on[2][5], const char icon_off[2][5], int col, int row) {
+    // The 2 represents the number of rows an icon takes up. Its hardcoded because 
+    // I don't know C and can't find how to get the lengh of an array when its passed
+    // in as a parameter. Could probably be another argument but :shrug:
     for (int i = 0; i < 2; i++) {
         oled_set_cursor(col, i + row);
         oled_write_P((on ? icon_on : icon_off)[i], false);
@@ -335,15 +338,13 @@ void render_shft_status(bool on, int col, int row) {
 };
 
 void render_logo(void) {
-    static const char PROGMEM corne_logo[3][6] = {
-        { 0x80, 0x81, 0x82, 0x83, 0x84, 0 }, 
-        { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0 },
-        { 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0 }
+    static const char PROGMEM quetzalcoatl_logo[] = {
+        0,  0,  0,  0,  0,  0,192, 32, 32,144,144,112,128, 96, 32, 59, 60, 40,187,188,168,187,188, 40, 59, 60, 32, 64,128,144, 96, 80, 96,208,  0,  0,  0,  0,  0,  0, 62, 65,129, 25, 33, 35, 20,136, 68, 34, 17,  9,129, 65, 33,  1,  1, 41, 18, 42,  4,  4,254,105,107,106,106,106, 10, 10,  2,  2,244, 10, 10, 10, 10,101, 97, 97,242,252,224,252,234,234,234,234,234,234,226,252,224,236,234,234,234,226,252,224,252,234,234,234,234,234,234,226,252,224,236,234,234,234,226,252,224,206,201,165, 17,142, 64, 38,148, 80, 16,224,
+        0,  0,  0,  0,  0,  0,135, 72, 41, 18,146,126,129,  0,  0, 56, 68, 68, 53, 82,210, 74, 90, 75, 90, 74, 90, 74, 89, 72, 88, 73, 89, 71, 64, 80, 72,176,  0,  0,  0,224, 16,  9,  5,195, 33, 16,  8,132, 66, 33, 16,136, 68,226, 17,  8,196, 32, 16,201, 39, 41, 77,133,  5,  5,  5,  5,  5,  4,  2,  5,  5,  5,  5, 10,  8,  8,  4,  3,  6,  9,  9,  6, 31, 16, 16, 12,  4,  4,  4,  4,  4,  4,  4,  2,  6,  9,  9,  6, 31, 16, 16, 12,  4,  4,  4,  4,  4,  4,  2,  6,  9,201, 38, 33,255,255,255,  2,228,  8,249, 17,225,  0, 
+        6,  9,145, 81, 34,145, 72, 36,146, 73, 36,146, 73, 37,146,252,132,184,136,248,  8,121,137,185, 73,  9,121,137,185, 73,  9,137, 71, 64, 64, 65, 66, 65, 96, 16, 16,243,196, 36, 34,207,144, 80, 80, 79, 68, 72, 72,103, 16, 17,242,196, 40, 49,210,146, 81, 72, 68, 67, 64, 64, 96, 16, 16,240,192, 32, 32,192,128, 64, 64, 64, 64, 64, 64, 64, 96, 16, 16,240,192, 32, 32,192,128, 64, 64, 64, 64, 64, 64, 64, 96, 16, 16,240,192, 32, 32,192, 70, 73, 73, 57,  1,  2, 28,135,192,224,255,255,127,160, 31,  8,207, 72, 75,140, 
+        2,  5,  8, 16,  9, 20, 34, 65, 36, 18,  9,  4, 30, 49, 96,196,140,144, 67, 39, 95,142,174,174,174,174,174,174,174,174,127, 14,126,142,174,174,174,110, 14,126,142,175,174,175,175,174,174,126, 14,126,142,174,174,174,110, 14,127,142,175,175,174,174,174,174,126, 14,126,142,174,174,174,111, 14,127,143,174,174,174,174,174,174,126, 14,126,142,174,174,175,110, 15,127,142,174,174,174,174,174,174,126, 14,126,142,174,175,174,111, 15,126,142,174,174,174,174,174,175,127,  7,  3,113,146,164,136,113,  2, 52, 21,  4,  3,
     };
-    for (int i = 0; i < 3; i++) {
-        oled_set_cursor(8, i + 1);
-        oled_write_P(corne_logo[i], false);
-    };
+    oled_write_raw_P(quetzalcoatl_logo, sizeof(quetzalcoatl_logo));
 }
 
 void render_layer_state(int col, int row) {
@@ -384,9 +385,9 @@ void render_layer_state(int col, int row) {
 
 static void render_status(void) {
     render_logo();
-    render_layer_state(0, 5);
+    render_layer_state(0, 4);
     uint8_t modifiers = get_mods() | get_oneshot_mods();
-    int row = 6;
+    int row = 5;
     render_shft_status(modifiers & MOD_MASK_SHIFT, 5, row);
     render_ctl_status(modifiers & MOD_MASK_CTRL, 9, row);
     render_alt_status(modifiers & MOD_MASK_ALT, 13, row);
@@ -395,7 +396,7 @@ static void render_status(void) {
 
 void oled_task_user(void) {
     if (is_keyboard_master()) {
-        render_status(); // Renders the current keyboard state (layer, lock, caps, scroll, etc)
+        render_status();
     } else {
         render_bongocat_logo();
     }

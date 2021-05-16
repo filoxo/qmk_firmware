@@ -17,6 +17,14 @@
 
 #pragma once
 
+#undef VENDOR_ID
+#define VENDOR_ID       0x3297
+#undef PRODUCT_ID
+#define PRODUCT_ID      0xC6CE
+#undef MANUFACTURER
+#define MANUFACTURER    ZSA Technology Labs
+#undef PRODUCT
+#define PRODUCT         Planck EZ
 /* USB Device descriptor parameter */
 #define DEVICE_VER 0x0000
 
@@ -43,16 +51,18 @@
 #define MATRIX_ROW_PINS { A10, A9, A8, B15, C13, C14, C15, A2 }
 #define MATRIX_COL_PINS { B11, B10, B2, B1, A7, B0 }
 
-#define NUMBER_OF_ENCODERS 1
 #define ENCODERS_PAD_A { B12 }
 #define ENCODERS_PAD_B { B13 }
 
 #define MUSIC_MAP
 #undef AUDIO_VOICES
-#undef C6_AUDIO
+#undef AUDIO_PIN
+#define AUDIO_PIN A5
+#define AUDIO_PIN_ALT A4
+#define AUDIO_PIN_ALT_AS_NEGATIVE
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE 6
+// #define DEBOUNCE 6
 
 /* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
 //#define LOCKING_SUPPORT_ENABLE
@@ -102,9 +112,6 @@
  * MIDI options
  */
 
-/* Prevent use of disabled MIDI features in the keymap */
-//#define MIDI_ENABLE_STRICT 1
-
 /* enable basic MIDI features:
    - MIDI notes can be sent when in Music mode is on
 */
@@ -139,3 +146,19 @@
 #define DRIVER_LED_TOTAL DRIVER_1_LED_TOTAL
 
 #define RGB_MATRIX_KEYPRESSES
+#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
+#define RGB_DISABLE_WHEN_USB_SUSPENDED true
+
+#define RGB_MATRIX_LED_PROCESS_LIMIT 5
+#define RGB_MATRIX_LED_FLUSH_LIMIT 26
+
+
+#define IGNORE_MOD_TAP_INTERRUPT
+
+#define TAPPING_TOGGLE  1
+
+#define MOUSEKEY_INTERVAL       20
+#define MOUSEKEY_DELAY          0
+#define MOUSEKEY_TIME_TO_MAX    60
+#define MOUSEKEY_MAX_SPEED      7
+#define MOUSEKEY_WHEEL_DELAY 0

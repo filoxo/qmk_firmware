@@ -22,3 +22,4 @@ RGB_MATRIX_ENABLE = yes
 RGB_MATRIX_DRIVER = WS2812
 BLUETOOTH_ENABLE = no       # Enable Bluetooth
 AUDIO_ENABLE = yes           # Audio output
+RGB_MATRIX_CUSTOM_USER = yes

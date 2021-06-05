@@ -21,6 +21,10 @@ enum layer_names {
     _FN
 };
 
+enum keycodes {
+  GB_LIGHTS = SAFE_RANGE
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base */
     [_BASE] = LAYOUT(
@@ -31,8 +35,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [_FN] = LAYOUT(
         RESET, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, 
-        KC_NO, KC_NO, KC_NO, KC_NO, 
-        KC_NO, RGB_TOG, RGB_MOD, KC_NO 
+        KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, 
+        KC_NO, RGB_HUD, RGB_SAD, RGB_VAD, 
+        KC_NO, RGB_TOG, RGB_MOD, GB_LIGHTS 
     )
 };
+
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case GB_LIGHTS:
+      if (record->event.pressed) {
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_CUSTOM_gb_lights);
+      }
+      return false; // Skip all further processing of this key
+    default:
+      return true; // Process all other keycodes normally
+  }
+};
+
